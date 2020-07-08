@@ -1,0 +1,7 @@
+{
+  "Server"      : "0.0.0.0:8084",
+  "MongoDBHost" : "localhost",
+  "MongoDBUser"	: "",
+  "MongoDBPwd"	: "",
+  "NokiaDatabase" : "nokia"
+}
