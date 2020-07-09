@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nokia-interview
+  labels: 
+          app: nokia-interview
+spec:
+  replicas: 1
+  selector:
+          matchLabels:
+                  app: nokia-interview
+  template:
+          metadata:
+                      labels:
+                              app: nokia-interview
+          spec:
+                  containers:
+                          - name: nokia-interview
+                            image: gkganeshr/nokia-interview:v0.1
+                            imagePullPolicy: Always
+                            ports:
+                                    - containerPort: 80 
+                  imagePullSecrets:
+                          - name: regcred
+                           
+
