@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
-	"github.com/golang/glog"
 	"github.com/gkganesh126/nokia-interview/common"
 	db "github.com/gkganesh126/nokia-interview/db-ops"
+	"github.com/golang/glog"
 	"gopkg.in/mgo.v2"
 )
 
@@ -17,19 +18,31 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	// Create new context
 	context := NewContext()
 	defer context.Close()
-	c := context.NokiaDbCollection("users")
-	repo := &db.UserRepository{c}
-	// Get all users form repository
-	users := repo.GetAll()
-	j, err := json.Marshal(UserResources{Data: users})
-	if err != nil {
-		common.DisplayAppError(w, err, "An unexpected error has occurred", 500)
-		return
+
+	items := StorageTemp.GetAll()
+
+	for _, item := range items {
+		fmt.Println(string(item.Content))
+		w.Write(item.Content)
+		w.Write([]byte("\n"))
+
 	}
+	/*
+		// get all from database.
+			c := context.NokiaDbCollection("users")
+			repo := &db.UserRepository{c}
+			// Get all users form repository
+			users := repo.GetAll()
+			j, err := json.Marshal(UserResources{Data: users})
+			if err != nil {
+				common.DisplayAppError(w, err, "An unexpected error has occurred", 500)
+				return
+			}
+	*/
 	// Send response back
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(j)
+
 }
 
 // Handler for HTTP Post - "/users"
@@ -37,6 +50,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	glog.Info("At CreateUser...\n")
 	var dbResource UserResource
+	var j []byte
 	// Decode the incoming User json
 	err := json.NewDecoder(r.Body).Decode(&dbResource)
 	if err != nil {
@@ -47,16 +61,22 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	glog.Info("user: ", user)
 	context := NewContext()
 	defer context.Close()
+
+	// write to cache : []byte(fmt.Sprintf("%v", user))
+	StorageTemp.Set(string(user.ID), []byte(user.MobNum))
+
+	//  backup write to db.
 	c := context.NokiaDbCollection("users")
 	// Create User
 	repo := &db.UserRepository{c}
 	repo.Create(user)
 	// Create response db
-	j, err := json.Marshal(dbResource)
+	j, err = json.Marshal(dbResource)
 	if err != nil {
 		common.DisplayAppError(w, err, "An unexpected error has occurred", 500)
 		return
 	}
+
 	// Send response back
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

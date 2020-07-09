@@ -4,9 +4,11 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/golang/glog"
 	"github.com/gkganesh126/nokia-interview/common"
+	"github.com/gkganesh126/nokia-interview/controllers"
+	"github.com/gkganesh126/nokia-interview/controllers/cache"
 	"github.com/gkganesh126/nokia-interview/routers"
+	"github.com/golang/glog"
 )
 
 // Entry point for the program
@@ -23,6 +25,8 @@ func main() {
 		Addr:    common.AppConfig.Server,
 		Handler: router,
 	}
+
+	controllers.StorageTemp = *cache.NewStorage()
 
 	glog.Info("Listening...")
 	server.ListenAndServe()
