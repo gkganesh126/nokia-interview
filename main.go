@@ -9,6 +9,7 @@ import (
 	"github.com/gkganesh126/nokia-interview/controllers/cache"
 	"github.com/gkganesh126/nokia-interview/routers"
 	"github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Entry point for the program
@@ -28,6 +29,11 @@ func main() {
 
 	controllers.StorageCache = *cache.NewStorage()
 	controllers.ReloadCacheFromDb()
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":2112", nil)
+	}()
 
 	glog.Info("Listening...")
 	server.ListenAndServe()
