@@ -19,7 +19,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	context := NewContext()
 	defer context.Close()
 
-	items := StorageTemp.GetAll()
+	items := StorageCache.GetAll()
 
 	for _, item := range items {
 		fmt.Println(string(item.Content))
@@ -63,7 +63,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	defer context.Close()
 
 	// write to cache : []byte(fmt.Sprintf("%v", user))
-	StorageTemp.Set(string(user.ID), []byte(user.MobNum))
+	StorageCache.Set(string(user.ID), []byte(user.MobNum))
 
 	//  backup write to db.
 	c := context.NokiaDbCollection("users")

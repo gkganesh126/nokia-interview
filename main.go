@@ -26,7 +26,8 @@ func main() {
 		Handler: router,
 	}
 
-	controllers.StorageTemp = *cache.NewStorage()
+	controllers.StorageCache = *cache.NewStorage()
+	controllers.ReloadCacheFromDb()
 
 	glog.Info("Listening...")
 	server.ListenAndServe()
