@@ -55,7 +55,7 @@ func ReloadCacheFromDb() {
 			break
 		}
 		fmt.Println(string(msg.Key), " ", string(msg.Value))
-		StorageCache.Set(string(msg.Key), []byte(msg.Key))
+		StorageCache.Set(string(msg.Key), []byte(msg.Value))
 	}
 
 	batch.Close()
